@@ -10,8 +10,15 @@ const errorHandler = (
 ) => {
   const error = err as AppError;
 
-  const statusCode = error.statusCode || 500;
-  const message = error.message || "Internal Server Error";
+  const isOperational = error.isOperational === true;
+
+  const statusCode = isOperational ? error.statusCode : 500;
+
+  const message = isOperational
+    ? error.message
+    : process.env.NODE_ENV === "development"
+      ? error.message
+      : "Internal Server Error";
 
   logger.error("API Error", {
     method: req.method,
